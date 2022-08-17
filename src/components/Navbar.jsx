@@ -8,6 +8,7 @@ import { TooltipComponent } from '@syncfusion/ej2-react-popups'
 import avatar from '../data/avatar.jpg';
 import { Cart, Chat, Notification, UserProfile } from '.'
 import { useStateContext } from '../contexts/ContextProvider';
+import { userProfileData } from '../data/dummy';
 
 
 const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
@@ -15,18 +16,32 @@ const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
         <button type='button' onClick={customFunc}
             style={{ color }}
             className='relative text-xl rounded-full p-3 hover:bg-light-gray'>
-            <span style={{ background: dotColor }} className='absoulte inline-flex rounded-full h-2 w-2 right-2 top-2'>
-                {icon}
-            </span>
+            <span style={{ background: dotColor }} className='absolute inline-flex rounded-full h-2 w-2 right-2 top-2' />
+            {icon}
+
         </button>
     </TooltipComponent>
 )
 const Navbar = () => {
-    const { activeMenu, setActiveMenu } = useStateContext();
+    const { activeMenu, setActiveMenu, isSelected, setIsSelected, handleClick,
+        screenSize, setScreenSize } = useStateContext();
 
-    const handleClick = (type) => {
+    useEffect(() => {
+        const handleResize = () => setScreenSize(window.innerWidth);
+        window.addEventListener('resize', handleResize)
+        handleResize();
 
-    }
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
+
+    useEffect(() => {
+        if (screenSize <= 900) {
+            setActiveMenu(false)
+        } else {
+            setActiveMenu(true)
+        }
+    }, [screenSize])
+
     return (
         <div className='flex justify-between p-2 md:mx-6 relative'>
 
@@ -58,6 +73,10 @@ const Navbar = () => {
                     </div>
 
                 </TooltipComponent>
+                {isSelected.cart && <Cart />}
+                {isSelected.chat && <Chat />}
+                {isSelected.userProfile && <UserProfile />}
+                {isSelected.notification && <Notification />}
             </div>
         </div>
     )
